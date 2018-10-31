@@ -16,7 +16,6 @@ public class JobTest extends BaseRunner {
         assertEquals("Поле обязательное", driver.findElement(By.xpath("(.//*[normalize-space(text()) and normalize-space(.)='Электронная почта'])[1]/following::div[3]")).getText());
         assertEquals("Необходимо указать номер телефона", driver.findElement(By.xpath("(.//*[normalize-space(text()) and normalize-space(.)='Номер телефона'])[1]/following::div[3]")).getText());
         assertEquals("Поле обязательное", driver.findElement(By.xpath("(.//*[normalize-space(text()) and normalize-space(.)='Город'])[1]/following::div[3]")).getText());
-        assertEquals("Поле обязательное", driver.findElement(By.cssSelector("div.Error__errorMessage_q8BBY")).getText());
         //assertEquals("Поле обязательное", driver.findElement(By.xpath("(.//*[normalize-space(text()) and normalize-space(.)='Продавец-консультант'])[2]/following::div[1]")).getText());
     }
 
