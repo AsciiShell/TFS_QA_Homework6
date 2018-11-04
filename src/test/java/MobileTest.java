@@ -1,5 +1,7 @@
+import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -8,9 +10,13 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+
 public class MobileTest extends BaseRunner {
 
-    public class SelectInput {
+    private class SelectInput {
         private WebElement element;
 
         SelectInput(String name) {
@@ -77,7 +83,7 @@ public class MobileTest extends BaseRunner {
         }
     }
 
-    public class CheckBox {
+    private class CheckBox {
         private String name;
 
         CheckBox(String text) {
@@ -108,15 +114,129 @@ public class MobileTest extends BaseRunner {
 
     }
 
+    private class TextInput {
+        private WebElement element;
+
+        TextInput(String name) {
+            element = driver.findElement(By.xpath("//*[@class='ui-input__label_placeholder-text' and contains(text(), '" + name + "')]/ancestor::div[@class='ui-input__column']//input[not(@disabled)]"));
+        }
+
+        String getText() {
+            return element.getAttribute("value");
+        }
+
+        void setText(String text) {
+            new Actions(driver).moveToElement(element)
+                    .click()
+                    .sendKeys(Keys.chord(Keys.CONTROL, "a"))
+                    .sendKeys(Keys.DELETE)
+                    .sendKeys(Keys.END)
+                    .sendKeys(text)
+                    .perform();
+        }
+    }
+
+    private class Button {
+        private WebElement element;
+
+        Button(String name) {
+            element = driver.findElement(By.xpath("//button[contains(string(),'" + name + "')]"));
+        }
+
+        public boolean isEnable() {
+            return element.isEnabled();
+        }
+
+        public void click() {
+            element.click();
+        }
+    }
+
+    private int getTotalPrice(){
+        return Integer.parseInt(driver.findElement(By.xpath("//div[@class='ui-form__field ui-form__field_title']/h3")).getText().split(":")[1].split(" ")[1]);
+    }
     public MobileTest() {
         baseUrl = "https://www.tinkoff.ru/mobile-operator/tariffs/";
     }
 
+
     @Test
-    public void testFirst() {
+    public void testGoogle() {
+        driver.get("https://www.google.ru/");
+        new Actions(driver).moveToElement(driver.findElement(By.xpath("//input[@name='q']")))
+                .click()
+                .sendKeys(Keys.chord(Keys.CONTROL, "a"))
+                .sendKeys(Keys.DELETE)
+                .sendKeys("мобайл тинькофф")
+                .perform();
+        new WebDriverWait(driver, 5).until(d ->
+                d.findElements(By.xpath("//li[string()='мобайл тинькофф тарифы']")).size() != 0
+        );
+
+        driver.findElement(By.xpath("//li[string()='мобайл тинькофф тарифы']")).click();
+        new WebDriverWait(driver, 5).until(d ->
+                d.findElements(By.xpath("//a[@href='" + baseUrl + "']")).size() != 0
+        );
+        driver.findElement(By.xpath("//a[@href='" + baseUrl + "']")).click();
+        driver.switchTo().window(String.valueOf(driver.getWindowHandles().toArray()[1]));
+        new WebDriverWait(driver, 10).until(
+                d -> ((JavascriptExecutor) d).executeScript("return document.readyState").equals("complete"));
+        assertEquals(driver.getTitle(), "Тарифы Тинькофф Мобайл");
+        driver.switchTo().window(String.valueOf(driver.getWindowHandles().toArray()[0]));
+        driver.close();
+
+        driver.switchTo().window(String.valueOf(driver.getWindowHandles().toArray()[0]));
+        assertEquals(driver.getCurrentUrl(), baseUrl);
+    }
+
+    @Test
+    public void testRegion() {
         driver.get(baseUrl);
-        CheckBox ch = new CheckBox("Мессенджеры");
-        ch.setActive(false);
-        System.out.println(ch.getText() + ch.isChecked());
+        new WebDriverWait(driver, 30).until(d ->
+                d.findElements(By.xpath("//span[@class='MvnoRegionConfirmation__option_3mrvz MvnoRegionConfirmation__optionRejection_2yo5M']")).size() != 0
+        );
+        driver.findElement(By.xpath("//span[@class='MvnoRegionConfirmation__option_3mrvz MvnoRegionConfirmation__optionRejection_2yo5M']")).click();
+        driver.findElement(By.xpath("//div[@class='MobileOperatorRegionsPopup__region_2eF67' and text()='Москва']")).click();
+        assertEquals(driver.findElement(By.xpath("//div[@class='MvnoRegionConfirmation__title_3WFCP']")).getText(), "Москва и Московская область");
+        driver.navigate().refresh();
+        assertEquals(driver.findElement(By.xpath("//div[@class='MvnoRegionConfirmation__title_3WFCP']")).getText(), "Москва и Московская область");
+        int defaultMoscowPrice = getTotalPrice();
+        new SelectInput("Интернет").setItem("Безлимитны");
+        new SelectInput("Звонки").setItem("Безлимитны");
+        new CheckBox("Режим модема").setActive(true);
+        new CheckBox("SMS").setActive(true);
+        int maxMoscowPrice = getTotalPrice();
+
+        driver.findElement(By.xpath("//div[@class='MvnoRegionConfirmation__title_3WFCP']")).click();
+        driver.findElement(By.xpath("//div[@class='MobileOperatorRegionsPopup__region_2eF67' and text()='Краснодар']")).click();
+        new WebDriverWait(driver, 10).until(d -> getTotalPrice() != maxMoscowPrice);
+        int defaultKrasnodarPrice = getTotalPrice();
+        new SelectInput("Интернет").setItem("Безлимитны");
+        new SelectInput("Звонки").setItem("Безлимитны");
+        new CheckBox("Режим модема").setActive(true);
+        new CheckBox("SMS").setActive(true);
+        int maxKrasnodarPrice = getTotalPrice();
+
+        assertNotEquals(defaultMoscowPrice, defaultKrasnodarPrice);
+        assertEquals(maxMoscowPrice, maxKrasnodarPrice);
+    }
+
+    @Test
+    public void testFree(){
+        driver.get(baseUrl);
+        new SelectInput("Интернет").setItem("0 ГБ");
+        new SelectInput("Звонки").setItem("0 минут");
+        new CheckBox("Мессенджеры").setActive(false);
+        new CheckBox("Социальные сети").setActive(false);
+        new CheckBox("Музыка").setActive(false);
+        new CheckBox("Видео").setActive(false);
+        new CheckBox("SMS").setActive(false);
+        assertEquals(getTotalPrice(), 0);
+        assertFalse(new Button("SIM").isEnable());
+    }
+    @Test
+    public void testDownload() {
+        driver.get("https://www.tinkoff.ru/mobile-operator/documents/");
+        driver.findElement(By.xpath("//a[@class='Link__link_3mUSi Link__link_color_blue_1bJUP Link__link_type_simple_3yVSl Link__link_nodecorated_3p7l4']")).click();
     }
 }
