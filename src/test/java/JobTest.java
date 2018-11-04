@@ -4,6 +4,10 @@ import org.openqa.selenium.By;
 import static org.junit.Assert.assertEquals;
 
 public class JobTest extends BaseRunner {
+    public JobTest() {
+        baseUrl = "https://moscow-job.tinkoff.ru/";
+    }
+
     @Test
     public void testFirst() {
         driver.get(baseUrl);
