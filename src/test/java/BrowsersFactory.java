@@ -30,7 +30,6 @@ public enum BrowsersFactory {
 
             ChromeOptions options = new ChromeOptions();
             options.addArguments("--disable-notifications");
-
             options.setExperimentalOption("prefs", chromePrefs);
             DesiredCapabilities cap = DesiredCapabilities.chrome();
             cap.setCapability(ChromeOptions.CAPABILITY, options);

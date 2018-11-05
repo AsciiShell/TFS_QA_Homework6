@@ -1,18 +1,15 @@
-import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 public class MobileTest extends BaseRunner {
 
@@ -152,9 +149,10 @@ public class MobileTest extends BaseRunner {
         }
     }
 
-    private int getTotalPrice(){
+    private int getTotalPrice() {
         return Integer.parseInt(driver.findElement(By.xpath("//div[@class='ui-form__field ui-form__field_title']/h3")).getText().split(":")[1].split(" ")[1]);
     }
+
     public MobileTest() {
         baseUrl = "https://www.tinkoff.ru/mobile-operator/tariffs/";
     }
@@ -178,9 +176,19 @@ public class MobileTest extends BaseRunner {
                 d.findElements(By.xpath("//a[@href='" + baseUrl + "']")).size() != 0
         );
         driver.findElement(By.xpath("//a[@href='" + baseUrl + "']")).click();
-        driver.switchTo().window(String.valueOf(driver.getWindowHandles().toArray()[1]));
-        new WebDriverWait(driver, 10).until(
-                d -> ((JavascriptExecutor) d).executeScript("return document.readyState").equals("complete"));
+
+        new WebDriverWait(driver, 10).until(d -> {
+            boolean check = false;
+            for (String title : driver.getWindowHandles()) {
+                driver.switchTo().window(title);
+                check = d.getTitle().equals("Тарифы Тинькофф Мобайл");
+                if (check) {
+                    break;
+                }
+            }
+            return check;
+        });
+
         assertEquals(driver.getTitle(), "Тарифы Тинькофф Мобайл");
         driver.switchTo().window(String.valueOf(driver.getWindowHandles().toArray()[0]));
         driver.close();
@@ -222,7 +230,7 @@ public class MobileTest extends BaseRunner {
     }
 
     @Test
-    public void testFree(){
+    public void testFree() {
         driver.get(baseUrl);
         new SelectInput("Интернет").setItem("0 ГБ");
         new SelectInput("Звонки").setItem("0 минут");
@@ -234,9 +242,18 @@ public class MobileTest extends BaseRunner {
         assertEquals(getTotalPrice(), 0);
         assertFalse(new Button("SIM").isEnable());
     }
+
     @Test
     public void testDownload() {
         driver.get("https://www.tinkoff.ru/mobile-operator/documents/");
-        driver.findElement(By.xpath("//a[@class='Link__link_3mUSi Link__link_color_blue_1bJUP Link__link_type_simple_3yVSl Link__link_nodecorated_3p7l4']")).click();
+
+        WebElement el = driver.findElement(By.xpath("//a[@class='Link__link_3mUSi Link__link_color_blue_1bJUP Link__link_type_simple_3yVSl Link__link_nodecorated_3p7l4']"));
+        el.click();
+
+        String[] path = el.getAttribute("href").split("/");
+        File f = new File(System.getProperty("download") + File.separator + path[path.length - 1]);
+        new WebDriverWait(driver, 10).until(d -> f.exists());
+        assertTrue(f.exists());
+        assertTrue(f.length() != 0);
     }
 }

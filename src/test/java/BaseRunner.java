@@ -21,7 +21,7 @@ public class BaseRunner {
     }
 
     private WebDriver getDriver() {
-        return BrowsersFactory.valueOf(System.getProperty("browser")).create();
+        return BrowsersFactory.chrome.create();
     }
 
 }

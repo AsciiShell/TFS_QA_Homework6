@@ -1,23 +1,17 @@
 # TFS_QA_Homework6
 
-Тестирование страницы https://moscow-job.tinkoff.ru/
+Тестирование следующих страниц: 
+
+- https://moscow-job.tinkoff.ru/
+
+- https://www.tinkoff.ru/mobile-operator/tariffs/ 
+
+- https://www.tinkoff.ru/mobile-operator/documents/
 
 Испльзована JDK 10.0.2
 
-Команда для запуска тестов в Chrome:
+Команда для запуска тестов:
 
 ```bash
--Dtest=JobTest -Dbrowser=chrome verify
-```
-
-Команда для запуска тестов в Firefox:
-
-```bash
--Dtest=JobTest -Dbrowser=firefox verify
-```
-
-Команда для запуска тестов в Opera:
-
-```bash
--Dtest=JobTest -Dbrowser=opera "-DoperaPath=\Path\To\opera.exe" verify
+-Dtest=JobTest,MobileTest verify
 ```
