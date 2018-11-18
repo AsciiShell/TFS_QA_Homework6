@@ -13,24 +13,30 @@ public class GoogleSearchPage extends Page {
         PageFactory.initElements(driver, this);
     }
 
-    public void open() {
+    public GoogleSearchPage open() {
         driver.get("https://www.google.ru/");
+        logger.info("Открыта главная страница Google");
         waitForTitle("Google");
+        logger.info("Проверка соответствия заголовка страницы Google");
+        return this;
     }
 
-    public void openSearchResultPage(String shortRequest, String fullRequest) {
+    public GoogleSearchPage openSearchResultPage(String shortRequest, String fullRequest) {
         new Actions(driver).moveToElement(driver.findElement(By.xpath("//input[@name='q']")))
                 .click()
                 .sendKeys(Keys.chord(Keys.CONTROL, "a"))
                 .sendKeys(Keys.DELETE)
                 .sendKeys(shortRequest)
                 .perform();
+        logger.info(String.format("Ввод поискового запроса \"%s\"", shortRequest));
         wait.until(d -> d.findElements(By.xpath(String.format("//li[@class='sbct' and contains(string(),'%s')]", fullRequest))).size() != 0);
         driver.findElement(By.xpath(String.format("//li[@class='sbct' and contains(string(),'%s')]", fullRequest))).click();
+        logger.info(String.format("Выбор результата для запроса \"%s\"", fullRequest));
+        return this;
     }
 
-    public void openSearchResultPage(String request) {
-        openSearchResultPage(request, request);
+    public GoogleSearchPage openSearchResultPage(String request) {
+        return openSearchResultPage(request, request);
     }
 
 }

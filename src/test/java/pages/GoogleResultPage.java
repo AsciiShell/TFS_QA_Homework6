@@ -11,8 +11,10 @@ public class GoogleResultPage extends Page {
         PageFactory.initElements(driver, this);
     }
 
-    public void clickSearchResultsByLinkContains(String link) {
+    public GoogleResultPage clickSearchResultsByLinkContains(String link) {
         wait.until(d -> d.findElements(By.xpath("//a[@href='" + link + "']")).size() != 0);
         driver.findElement(By.xpath("//a[@href='" + link + "']")).click();
+        logger.info(String.format("Переход по ссылке в поисковой выдаче Google \"%s\"", link));
+        return this;
     }
 }

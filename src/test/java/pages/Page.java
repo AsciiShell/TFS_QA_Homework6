@@ -1,15 +1,19 @@
 package pages;
 
+import app.Application;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class Page {
+    protected Logger logger = LoggerFactory.getLogger(Application.class);
     protected WebDriver driver;
     protected WebDriverWait wait;
 
@@ -33,6 +37,7 @@ public class Page {
             }
             return check;
         });
+        logger.info(String.format("Переключение на вкладку \"%s\"", windowName));
     }
 
     public void getPage(String url) {
@@ -60,13 +65,16 @@ public class Page {
 
     public void refresh() {
         driver.navigate().refresh();
+        logger.info("Обновение срнаницы");
     }
 
     public void closeCurrentTab() {
         driver.close();
+        logger.info("Закрытие текущей вкладки");
     }
 
     public void switchToMainTab() {
         driver.switchTo().window(driver.getWindowHandles().iterator().next());
+        logger.info("Переход на 1 вкладку");
     }
 }

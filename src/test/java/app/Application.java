@@ -3,13 +3,15 @@ package app;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.events.EventFiringWebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pages.*;
 import test.BrowsersFactory;
 
 import java.util.concurrent.TimeUnit;
 
 public class Application {
-
+    public Logger logger = LoggerFactory.getLogger(Application.class);
     private WebDriverWait wait;
     private WebDriver driver;
     public GoogleSearchPage google;

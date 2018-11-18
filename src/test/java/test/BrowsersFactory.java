@@ -17,6 +17,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 
 public class BrowsersFactory {
+
     public static WebDriver buildDriver(String browserName) {
         switch (browserName) {
 

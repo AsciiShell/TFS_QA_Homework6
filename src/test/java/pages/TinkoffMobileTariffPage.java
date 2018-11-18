@@ -159,30 +159,35 @@ public class TinkoffMobileTariffPage extends Page {
 
     public TinkoffMobileTariffPage open() {
         driver.get(baseUrl);
+        logger.info("Открытие страницы Tinkoff Mobile");
         waitForTitle("Тарифы Тинькофф Мобайл");
+        logger.info("Проверка заголовка страницы Tinkoff Mobile");
         return this;
     }
 
     public TinkoffMobileTariffPage assertUrl() {
         assertEquals(driver.getCurrentUrl(), baseUrl);
+        logger.info("Проверка адреса страницы Tinkoff Mobile");
         return this;
     }
 
     public String getRegion() {
-        wait.until(d -> d.findElements(By.xpath("//span[@class='MvnoRegionConfirmation__regionName_2hRIp']")).size() != 0 ||
-                d.findElements(getRegionSelector()).size() != 0);
-        if (driver.findElements(By.xpath("//span[@class='MvnoRegionConfirmation__regionName_2hRIp']")).size() != 0) {
-            String region = driver.findElement(By.xpath("//span[@class='MvnoRegionConfirmation__regionName_2hRIp']")).getText();
-            return region.substring(0, region.length() - 1);
+        wait.until(d -> d.findElements(getRegionSelector()).size() != 0 ||
+                d.findElements(By.xpath("//span[@class='MvnoRegionConfirmation__regionName_2hRIp']")).size() != 0);
+        String region;
+        if (driver.findElements(getRegionSelector()).size() != 0) {
+            region = driver.findElement(getRegionSelector()).getText();
         } else {
-            return driver.findElement(getRegionSelector()).getText();
+            region = driver.findElement(By.xpath("//span[@class='MvnoRegionConfirmation__regionName_2hRIp']")).getText();
+            region = region.substring(0, region.length() - 1);
         }
+        return region;
     }
 
     public TinkoffMobileTariffPage setRegion(String region) {
         wait.until(d ->
-                d.findElements(getFirstRegionSelector()).size() != 0 ||
-                        d.findElements(getRegionSelector()).size() != 0
+                d.findElements(getRegionSelector()).size() != 0 ||
+                        d.findElements(getFirstRegionSelector()).size() != 0
         );
         if (driver.findElements(getFirstRegionSelector()).size() != 0) {
             driver.findElement(getFirstRegionSelector()).click();
@@ -191,65 +196,85 @@ public class TinkoffMobileTariffPage extends Page {
         }
         driver.findElement(By.xpath("//div[@class='MobileOperatorRegionsPopup__region_2eF67']/div[contains(text(), '" + region + "')]")).click();
         wait.until(d -> getRegion().contains(region));
+        logger.info(String.format("Установлен регион \"%s\"", region));
         return this;
     }
 
     public TinkoffMobileTariffPage assertRegion(String region) {
         assertTrue(getRegion().contains(region));
+        logger.info(String.format("Проверен регион \"%s\"", region));
         return this;
     }
 
     public TinkoffMobileTariffPage setInternet(String value) {
         new SelectInput("Интернет").setItem(value);
+        logger.info(String.format("Установлен Интернет \"%s\"", value));
         return this;
     }
 
     public TinkoffMobileTariffPage setMinutes(String value) {
         new SelectInput("Звонки").setItem(value);
+        logger.info(String.format("Установлены звонки \"%s\"", value));
         return this;
     }
 
     public TinkoffMobileTariffPage setUnlimitedMessages(boolean value) {
         new CheckBox("Мессенджеры").setActive(value);
+        logger.info(String.format("Установлены мессенджеры \"%s\"", value));
         return this;
     }
 
     public TinkoffMobileTariffPage setUnlimitedSocialNetworks(boolean value) {
         new CheckBox("Социальные сети").setActive(value);
+        logger.info(String.format("Установлены социальные сети \"%s\"", value));
         return this;
     }
 
     public TinkoffMobileTariffPage setUnlimitedMusic(boolean value) {
         new CheckBox("Музыка").setActive(value);
+        logger.info(String.format("Установлена музыка \"%s\"", value));
         return this;
     }
 
     public TinkoffMobileTariffPage setUnlimitedVideo(boolean value) {
         new CheckBox("Видео").setActive(value);
+        logger.info(String.format("Установлено видео \"%s\"", value));
         return this;
     }
 
     public TinkoffMobileTariffPage setUnlimitedSMS(boolean value) {
         new CheckBox("SMS").setActive(value);
+        logger.info(String.format("Установлены SMS \"%s\"", value));
         return this;
     }
 
     public TinkoffMobileTariffPage setModem(boolean value) {
         new CheckBox("Режим модема").setActive(value);
+        logger.info(String.format("Установлен режим модема \"%s\"", value));
         return this;
     }
 
     public int getTotalPrice() {
+        wait.until(d -> {
+            try {
+                Integer.parseInt(d.findElement(By.xpath("//div[@class='ui-form__field ui-form__field_title']/h3")).getText().split(":")[1].split(" ")[1]);
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
         return Integer.parseInt(driver.findElement(By.xpath("//div[@class='ui-form__field ui-form__field_title']/h3")).getText().split(":")[1].split(" ")[1]);
     }
 
     public TinkoffMobileTariffPage assertPriceEqual(int price) {
         assertEquals(getTotalPrice(), price);
+        logger.info(String.format("Проверка равенства цены тарифа \"%d\"", price));
         return this;
     }
 
     public TinkoffMobileTariffPage assertPriceNotEqual(int price) {
         assertNotEquals(getTotalPrice(), price);
+        logger.info(String.format("Проверка неравенства цены тарифа \"%d\"", price));
         return this;
     }
 }

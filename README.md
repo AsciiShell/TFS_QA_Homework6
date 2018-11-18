@@ -15,3 +15,9 @@
 ```bash
 -Dtest=JobTest,MobileTest verify
 ```
+
+Команда для удаленного запуска тестов (требуется уже запущенный хаб):
+
+```bash
+-Dtest=JobTest,MobileTest -Dbrowser=chrome_remote verify
+```

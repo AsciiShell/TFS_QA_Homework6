@@ -1,25 +1,25 @@
 package test;
 
 import org.junit.Test;
+import pages.GoogleResultPage;
 import pages.TinkoffMobileTariffPage;
 
 public class MobileTest extends BaseRunner {
-    /*
-        @Test
-        public void testGoogle() {
-            GoogleSearchPage googleSearch = app.google;
-            googleSearch.open();
-            googleSearch.openSearchResultPage("мобайл тинькофф", "тинькофф мобайл тарифы");
-            GoogleResultPage googleResult = app.googleResults;
-            TinkoffMobileTariffPage tinkoffMobile = app.tinkoffMobile;
-            googleResult.clickSearchResultsByLinkContains(tinkoffMobile.baseUrl);
-            googleResult.switchToWindow("Тарифы Тинькофф Мобайл");
-            googleResult.switchToMainTab();
-            googleResult.closeCurrentTab();
-            tinkoffMobile.switchToMainTab();
-            tinkoffMobile.assertUrl();
-        }
-    */
+
+    @Test
+    public void testGoogle() {
+        app.google.open()
+                .openSearchResultPage("мобайл тинькофф", "тинькофф мобайл тарифы");
+        GoogleResultPage googleResult = app.googleResults;
+        TinkoffMobileTariffPage tinkoffMobile = app.tinkoffMobile;
+        googleResult.clickSearchResultsByLinkContains(tinkoffMobile.baseUrl);
+        googleResult.switchToWindow("Тарифы Тинькофф Мобайл");
+        googleResult.switchToMainTab();
+        googleResult.closeCurrentTab();
+        tinkoffMobile.switchToMainTab();
+        tinkoffMobile.assertUrl();
+    }
+
     @Test
     public void testRegion() {
         TinkoffMobileTariffPage tinkoffMobile = app.tinkoffMobile;
